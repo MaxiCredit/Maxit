@@ -36,7 +36,7 @@ let users = [];
 let args = process.argv;
 
 let topicId = new ConsensusTopicId(0, 0, args[2]);
-const topicFile = "0.0." + args[3] + ".json";
+const topicFile = "0.0." + args[2] + ".json";
 
 new MirrorConsensusTopicQuery()
     .setTopicId(topicId)
