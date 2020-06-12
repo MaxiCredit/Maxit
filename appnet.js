@@ -144,7 +144,7 @@ function User(address, balance, allowance) {
     this.approve = function(to, sum, myId) {
         checkUser(to, (err, res) => {
             if(!err) {
-				let type = "approve",
+				let type = "approve";
 				let txHash = crypto.createHash('sha512').update(type + this.address + to + sum.toString()).digest('hex');
 				let hash = crypto.createHash('sha512').update(latestHash.toString()+txHash.toString()).digest('hex');
 				console.log(latestHash, txHash, hash);
