@@ -2,6 +2,7 @@ pragma solidity >=0.4.25;
 import "./AddressUtils.sol";
 
 contract ERC20Interface {
+    function approve(address _spender, uint _sum) public;
     function allowance(address _from, address _to) public view returns(uint);
     function transferFrom(address _from, address _to, uint _sum) public;
     function transfer(address _to, uint _sum) public;
@@ -30,6 +31,12 @@ contract MXHederaChange {
     }
 
     //Convert between blockchains
+    //Should be tested, probably won't work, cause msg.sender != address(this)
+    function approve(address _buyer, uint _amount) public onlyServer {
+        mxi.approve(address _buyer, uint _amount);   
+    }
+    
+    //should put back to Maxit smart contract
     function convertToHederaMX(address _buyer, uint _amount) public onlyServer {
        require(getTokenBalance(address(this)) >= _amount);
        require(mxi.allowance(address(this), _buyer) >= _amount);
