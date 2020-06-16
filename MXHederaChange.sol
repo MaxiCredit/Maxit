@@ -2,7 +2,6 @@ pragma solidity >=0.4.25;
 import "./AddressUtils.sol";
 
 contract ERC20Interface {
-    function approve(address _spender, uint _sum) public;
     function allowance(address _from, address _to) public view returns(uint);
     function transferFrom(address _from, address _to, uint _sum) public;
     function transfer(address _to, uint _sum) public;
@@ -29,30 +28,26 @@ contract MXHederaChange {
         require(msg.sender == owner);
         _;
     }
-
-    //Convert between blockchains
-    //Should be tested, probably won't work, cause msg.sender != address(this)
-    function approve(address _buyer, uint _amount) public onlyServer {
-        mxi.approve(address _buyer, uint _amount);   
-    }
     
-    //should put back to Maxit smart contract
+    function getBalances() public view returns(uint, uint) {
+        return(mxi.getTokenBalance(address(this), address(this).balance);
+    }
+
     function convertToHederaMX(address _buyer, uint _amount) public onlyServer {
-       require(getTokenBalance(address(this)) >= _amount);
-       require(mxi.allowance(address(this), _buyer) >= _amount);
-       mxi.transferFrom(address(this), _buyer, _amount); 
+       require(mxi.getTokenBalance(address(this)) >= _amount);
+       mxi.transfer(_buyer, _amount); 
        emit ConvertToHederaMX(_buyer, _amount);
     }
     
     function convertFromHederaMX(uint _amount) public {
-       require(getTokenBalance(msg.sender) >= _amount);
+       require(mxi.getTokenBalance(msg.sender) >= _amount);
        require(mxi.allowance(msg.sender, address(this)) >= _amount);
        mxi.transferFrom(msg.sender, address(this), _amount);
        emit ConvertFromHederaMX(msg.sender, _amount);
     }
     
     function buyToken(uint _sum) public payable {
-        require(getTokenBalance(address(this)) >= _sum);
+        require(mxi.getTokenBalance(address(this)) >= _sum);
         uint priceHbar;
         (,priceHbar,) = mxi.getPrices();
         uint price = _sum * priceHbar * 101 / 100;
@@ -65,7 +60,7 @@ contract MXHederaChange {
         uint priceHbar;
         (,priceHbar,) = mxi.getPrices();
         uint price = _sum * priceHbar * 99 / 100;
-        require(getTokenBalance(msg.sender) >= _sum);
+        require(mxi.getTokenBalance(msg.sender) >= _sum);
         require(mxi.allowance(msg.sender, address(this)) >= _sum);
         mxi.transferFrom(msg.sender, address(this), _sum);
         msg.sender.transfer(price);
